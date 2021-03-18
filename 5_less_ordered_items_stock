@@ -1,0 +1,8 @@
+USE toys_and_models;
+SELECT p.productName, p.quantityInStock, sum(o.quantityOrdered) nb_quantity_ordered
+FROM orderdetails o
+JOIN products p
+ON o.productCode= p.productCode
+GROUP BY p.productCode 
+ORDER BY nb_quantity_ordered asc
+LIMIT 5;
