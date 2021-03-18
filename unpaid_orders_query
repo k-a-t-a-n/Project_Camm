@@ -1,0 +1,5 @@
+USE toys_and_models;
+SELECT o.customerNumber, c.customerName, c.contactLastName, c.phone, o.orderNumber, o.status, o.comments
+FROM orders o
+JOIN customers c ON c.customerNumber = o.customerNumber
+WHERE status LIKE "on hold" AND comments LIKE "%exceed%";
