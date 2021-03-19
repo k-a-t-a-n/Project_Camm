@@ -1,0 +1,8 @@
+SELECT o2.orderDate as date, COUNT(o2.orderNumber) as nb_commandes
+FROM products p
+JOIN orderdetails o
+ON p.productCode = o.productCode 
+JOIN orders o2 
+ON o.orderNumber = o2.orderNumber
+GROUP BY date
+ORDER BY date DESC;
