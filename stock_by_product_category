@@ -1,0 +1,7 @@
+SELECT p.productName, p.quantityInStock, sum(o.quantityOrdered) s
+FROM orderdetails o
+JOIN products p
+ON o.productCode= p.productCode
+GROUP BY p.productCode 
+ORDER BY s DESC
+LIMIT 5;
