@@ -1,0 +1,51 @@
+WITH turnover_product AS(
+	SELECT p.productLine as produit,YEAR(o.orderDate) as annee, MONTH(o.orderDate) as mois, SUM(od.quantityOrdered) as total
+	FROM orderdetails as od
+	JOIN products as p
+	ON od.productCode = p.productCode
+	JOIN orders as o
+	ON od.orderNumber = o.orderNumber
+	GROUP BY produit, annee, mois),
+	turnover_product2 AS (
+	SELECT produit, total, annee, mois,
+	SUM(CASE WHEN mois = 1 THEN total ELSE NULL END) janvier,
+	SUM(CASE WHEN mois = 2 THEN total ELSE NULL END) fevrier,
+	SUM(CASE WHEN mois = 3 THEN total ELSE NULL END) mars,
+	SUM(CASE WHEN mois = 4 THEN total ELSE NULL END) avril,
+	SUM(CASE WHEN mois = 5 THEN total ELSE NULL END) mai,
+	SUM(CASE WHEN mois = 6 THEN total ELSE NULL END) juin,
+	SUM(CASE WHEN mois = 7 THEN total ELSE NULL END) juillet,
+	SUM(CASE WHEN mois = 8 THEN total ELSE NULL END) août,
+	SUM(CASE WHEN mois = 9 THEN total ELSE NULL END) septembre,
+	SUM(CASE WHEN mois = 10 THEN total ELSE NULL END) octobre,
+	SUM(CASE WHEN mois = 11 THEN total ELSE NULL END) novembre,
+	SUM(CASE WHEN mois = 12 THEN total ELSE NULL END) decembre
+	FROM turnover_product
+	GROUP BY produit, annee, mois
+	ORDER BY produit, annee, mois)
+SELECT produit, total, annee, mois, janvier, 
+100 * (janvier- lag(janvier, 12) over (partition by produit)) / lag(janvier, 12) over (partition by produit) as '(%) janvier',
+fevrier, 
+100 * (fevrier- lag(fevrier, 12) over (partition by produit)) / lag(fevrier, 12) over (partition by produit) as '(%) fevrier',
+mars,
+100 * (mars- lag(mars, 12) over (partition by produit)) / lag(mars, 12) over (partition by produit) as '(%) mars',
+avril,
+100 * (avril- lag(avril, 12) over (partition by produit)) / lag(avril, 12) over (partition by produit) as '(%) avril',
+mai,
+100 * (mai- lag(mai, 12) over (partition by produit)) / lag(mai, 12) over (partition by produit) as '(%) mai',
+juin,
+100 * (juin- lag(juin, 12) over (partition by produit)) / lag(juin, 12) over (partition by produit) as '(%) juin',
+juillet,
+100 * (juillet- lag(juillet, 12) over (partition by produit)) / lag(juillet, 12) over (partition by produit) as '(%) juillet',
+août,
+100 * (août- lag(août, 12) over (partition by produit)) / lag(août, 12) over (partition by produit) as '(%) aout',
+septembre,
+100 * (septembre- lag(septembre, 12) over (partition by produit)) / lag(septembre, 12) over (partition by produit) as '(%) septembre',
+octobre,
+100 * (octobre- lag(octobre, 12) over (partition by produit)) / lag(octobre, 12) over (partition by produit) as '(%) octobre',
+novembre,
+100 * (novembre- lag(novembre, 12) over (partition by produit)) / lag(novembre, 12) over (partition by produit) as '(%) septembre',
+decembre,
+100 * (decembre- lag(decembre, 12) over (partition by produit)) / lag(decembre, 12) over (partition by produit) as '(%) decembre'
+FROM turnover_product2
+GROUP BY 1, produit, total, annee, mois, janvier, fevrier, mars, avril, mai, juin, juillet, août, septembre, octobre, novembre, decembre;
