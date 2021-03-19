@@ -1,0 +1,15 @@
+WITH payment AS 
+(SELECT c.customerNumber, SUM(od.quantityOrdered * od.priceEach) as turnover, p.amount
+from orders o
+join orderdetails od on o.orderNumber = od.orderNumber
+join customers c on o.customerNumber = c.customerNumber 
+join payments p on c.customerNumber = p.customerNumber
+group by c.customerNumber, p.amount), 
+customer_receivables AS(
+SELECT customerNumber, turnover, SUM(amount) as total_amount
+FROM payment
+GROUP BY customerNumber, turnover)
+SELECT customerNumber, (turnover - total_amount) as receivables 
+FROM customer_receivables
+ORDER BY receivables DESC
+;
