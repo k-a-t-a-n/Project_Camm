@@ -1,0 +1,2 @@
+SELECT * FROM toys_and_models.orders
+WHERE status != 'Shipped';
