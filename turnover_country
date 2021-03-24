@@ -1,0 +1,36 @@
+USE toys_and_models;
+
+SELECT YEAR(o.orderDate) Year,
+       MONTH(o.orderDate) Month,
+       c.country,
+       SUM(od.quantityOrdered * od.priceEach) Turnover
+FROM orderdetails od
+JOIN orders o
+    ON od.orderNumber = o.orderNumber
+JOIN customers c
+    ON o.customerNumber = c.customerNumber
+GROUP BY Year, Month, c.country 
+HAVING 
+        (Year = (SELECT YEAR(orderDate) Year
+        FROM orders
+        GROUP BY Year, MONTH(orderDate)
+        ORDER BY Year DESC, MONTH(orderDate) DESC
+        LIMIT 1) 
+    AND Month = (SELECT MONTH(orderDate) Month
+        FROM orders
+        GROUP BY YEAR(orderDate), Month
+        ORDER BY YEAR(orderDate) DESC, Month DESC
+        LIMIT 1))
+OR 
+        (Year = (SELECT YEAR(orderDate) Year
+        FROM orders
+        GROUP BY Year, MONTH(orderDate)
+        ORDER BY Year DESC, MONTH(orderDate) DESC
+        LIMIT 1 OFFSET 1)
+    AND Month = (SELECT MONTH(orderDate) Month
+        FROM orders
+        GROUP BY YEAR(orderDate), Month
+        ORDER BY YEAR(orderDate) DESC, Month DESC
+        LIMIT 1 OFFSET 1))
+
+ORDER BY Year DESC, Month DESC;
